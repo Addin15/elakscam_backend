@@ -61,10 +61,11 @@ def validate(request, number):
 
 
 class ReportView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    authentication_classes = []
 
     def post(self,request):
+        user = User.objects.first()
+
         serializer = ReportSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
@@ -85,17 +86,28 @@ class ReportView(APIView):
             if data.get("evidence_description") is not None:
                 report_data['evidence_description'] = data['evidence_description']            
 
-
-            # report_data['reported_by'] = request.user
-
-            report = Report.objects.create(**report_data, reported_by = request.user) 
+            report = Report.objects.create(
+                account_number=data['account_number'],
+                category=data['category'],
+                evidence=None if data.get("evidence") is None else data['evidence'],
+                evidence_description=None if data.get("evidence_description") is None else data['evidence_description'],
+                reported_by=user,
+                )
 
             serializer = ReportSerializer(report)
 
-            return Response(data=serializer.data,status=status.HTTP_200_OK)
+            return Response(data=serializer.data,status=status.HTTP_201_CREATED)
         except Exception as e:
             print(e)
             return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+    def get(self, request):
+        user = User.objects.first()
+
+        reports = Report.objects.filter(reported_by_id=user.id)
+        serializer = ReportSerializer(reports, many=True)
+
+        return Response(data=serializer.data,status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 @authentication_classes([])
