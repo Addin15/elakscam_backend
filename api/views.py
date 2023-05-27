@@ -85,10 +85,13 @@ class ReportView(APIView):
             if data.get("evidence_description") is not None:
                 report_data['evidence_description'] = data['evidence_description']            
 
-
-            # report_data['reported_by'] = request.user
-
-            report = Report.objects.create(**report_data, reported_by = request.user) 
+            report = Report.objects.create(
+                account_number=data['account_number'],
+                category=data['category'],
+                evidence=None if data.get("evidence") is None else data['evidence'],
+                evidence_description=None if data.get("evidence_description") is None else data['evidence_description'],
+                reported_by=request.user,
+                )
 
             serializer = ReportSerializer(report)
 

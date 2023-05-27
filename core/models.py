@@ -17,12 +17,10 @@ class Report(models.Model):
         return "documents/reports/{id}/{filename}".format(
             id=self.id, filename=filename
         )
-    
-    id = models.IntegerField(primary_key=True)
     account_number = models.CharField(max_length=50)
     category = models.CharField(max_length=20)
-    evidence = models.FileField(upload_to=report_document_loc)
-    evidence_description = models.TextField()
+    evidence = models.FileField(upload_to=report_document_loc, null=True, blank=True)
+    evidence_description = models.TextField(null=True, blank=True)
     datetime = models.DateTimeField(default=timezone.now)
     reported_by = models.ForeignKey(User, on_delete=models.CASCADE)
 
