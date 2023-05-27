@@ -10,7 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+from datetime import timedelta
+from rest_framework.settings import api_settings
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +28,7 @@ SECRET_KEY = 'django-insecure-zvrs3(_b-4_tmxie-6ezvsf*b7f)6z@7+!u%vz&d7pcz%=bb83
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -37,6 +40,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Local apps
+    'core',
+    'api',
+    'users',
+    # 3rd party app
+    'rest_framework',
+    'knox',
 ]
 
 MIDDLEWARE = [
@@ -48,6 +58,24 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": "knox.auth.TokenAuthentication",
+}
+
+REST_KNOX = {
+    "SECURE_HASH_ALGORITHM": "cryptography.hazmat.primitives.hashes.SHA512",
+    # By default, it is set to 64 characters (this shouldn't need changing).
+    "AUTH_TOKEN_CHARACTER_LENGTH": 64,
+    # The default is 10 hours i.e., timedelta(hours=10)).
+    "TOKEN_TTL": timedelta(weeks=1),
+    "USER_SERIALIZER": "knox.serializers.UserSerializer",
+    # By default, this option is disabled and set to None -- thus no limit.
+    "TOKEN_LIMIT_PER_USER": None,
+    # This defines if the token expiry time is extended by TOKEN_TTL each time the token is used.
+    "AUTO_REFRESH": False,
+    "EXPIRY_DATETIME_FORMAT": api_settings.DATETIME_FORMAT,
+}
 
 ROOT_URLCONF = 'elakscam.urls'
 
@@ -115,9 +143,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = "users.User"
