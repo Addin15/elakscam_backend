@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     # 3rd party app
     'rest_framework',
     'knox',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [

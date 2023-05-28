@@ -6,7 +6,7 @@ from users.models import User
 # Create your models here.
 class Account(models.Model):
     id = None
-    number = models.CharField(max_length=50, unique=True, primary_key=True)
+    number = models.CharField(max_length=255, unique=True, primary_key=True)
     holder_name = models.CharField(max_length=255, null=True, blank=True)
     holder_nric = models.CharField(max_length=50, null=True, blank=True)
     evidence_score = models.IntegerField(default=0)
